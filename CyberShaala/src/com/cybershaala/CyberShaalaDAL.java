@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import com.cybershaala.CyberShaalaDAL;
+import com.cybershaala.data.model.Feedback;
+
 import com.cybershaala.data.model.Materials;
 
 public class CyberShaalaDAL {
@@ -60,31 +63,46 @@ public class CyberShaalaDAL {
 		}
 	}
 	
-	public ArrayList<String> selectConversations(String convId)
+	public static void insertIntoMaterialsAsBatch(List<Materials> materialsList)
 	{
-		ArrayList<String> convAl = null;
+		createConnectionAndStatement();
 		try {
-			createConnectionAndStatement();
-			convAl = new ArrayList<String>();
-			System.out.println("ConvId:"+convId);
-			String sql = "SELECT * FROM CONVERSATION WHERE conversationId='"+convId+"'";
-			ResultSet rs = statement.executeQuery(sql);
-			while(rs.next())
-			{
-				String videoFileName = rs.getString("videoFileName");
-				System.out.println("VideoFileName:"+videoFileName);
-				convAl.add(videoFileName);				
+			for (Materials material : materialsList) {
+				String sql = "INSERT INTO cybershaala_materials (MaterialURL, MaterialName, MaterialDesc, UserID, Tags, Type, DateCreated)" +
+						" VALUES ('"+material.getMaterialUrl()+"', '"+material.getMaterialName()+"', '"+material.getMaterialDesc()+"', "
+								+ "'"+material.getUserId()+"', '"+material.getTags()+"', '"+material.getType()+"', '"+material.getDateTime()+"')";
+				System.out.println(sql);
+				statement.executeUpdate(sql);
 			}
-			Collections.sort(convAl);
-			return convAl;
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
 			close();
-			return convAl;
+		} catch (SQLException e) {
+			System.err.println("=====ERROR OCCURRED WHILE INSERTING=====");
+			e.printStackTrace();
 		}
-
+		finally{
+			close();
+		}
 	}
+	
+	public static void insertIntoFeedbackAsBatch(List<Feedback> feedbackList)
+	{
+		createConnectionAndStatement();
+		try {
+			for (Feedback fdb : feedbackList) {
+				String sql = "INSERT INTO cybershaala_feedback (MaterialURL, FinalScore)" +
+						" VALUES ('"+fdb.getMaterialUrl()+"', '"+fdb.getFinalScore()+"')";
+				statement.executeUpdate(sql);
+			}
+			close();
+		} catch (SQLException e) {
+			System.err.println("=====ERROR OCCURRED WHILE INSERTING=====");
+			e.printStackTrace();
+		}
+		finally{
+			close();
+		}
+	}
+	
 
 //	public void createTable()
 //	{

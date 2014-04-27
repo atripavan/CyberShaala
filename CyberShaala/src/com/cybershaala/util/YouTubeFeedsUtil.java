@@ -30,8 +30,14 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.cybershaala.CyberShaalaDAL;
+import com.cybershaala.data.model.Feedback;
 import com.cybershaala.data.model.Materials;
 
+/**
+ * @author Pavan
+ *Class to fetch feeds from Youtube based on tags.
+ *Hit the url, get xml and parse out the required content
+ */
 public class YouTubeFeedsUtil {
 	XPathFactory xFactory = XPathFactory.newInstance();
 	XPath xpath = xFactory.newXPath();
@@ -79,6 +85,7 @@ public class YouTubeFeedsUtil {
 	public void parseFeedXml(InputStream is)
 	{
 		List<Materials> materialsList = new ArrayList<Materials>();
+		List<Feedback> fdbList = new ArrayList<Feedback>();
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			factory.setNamespaceAware(true);
@@ -96,24 +103,37 @@ public class YouTubeFeedsUtil {
 			for(int i=1;i<=numEntryNodes;i++)
 			{
 				Materials objMat = new Materials();
+				Feedback objFdb = new Feedback();
 				
-				System.out.println("Video Link---------:");
-				objMat.setMaterialUrl(getXMLNodeValue(doc, "attr", "//*[local-name()='entry']["+i+"]/*[local-name()='link'][1]/@href"));
-				System.out.println("Title---------:");				
-				objMat.setMaterialName(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='title']"));
-				System.out.println("Description---------:");
+				String materialUrl = getXMLNodeValue(doc, "attr", "//*[local-name()='entry']["+i+"]/*[local-name()='link'][1]/@href");
+				System.out.println("***********Processing video URL:"+materialUrl+"***********");
+				objMat.setMaterialUrl(materialUrl);
+				objMat.setMaterialName(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='title']"));				
 				objMat.setMaterialDesc(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='content']"));
 				objMat.setType("youtube");
 				objMat.setDateTime(new Timestamp((new Date()).getTime()));
 				objMat.setUserId("YouTubeFeeds");
 				objMat.setTags(tags);
 				
-				CyberShaalaDAL.createConnectionAndStatement();
-				CyberShaalaDAL.insertIntoMaterials(objMat);
-				CyberShaalaDAL.close();
+				int viewCount = Integer.parseInt(getXMLNodeValue(doc, "attr", "//*[local-name()='entry'][1]/*[local-name()='statistics']/@viewCount"));
+				int finalScore = 0;
+				if (viewCount > 20000)
+					finalScore = 10;
+				else if (viewCount > 10000)
+					finalScore = 9;
+				else if (viewCount > 5000)
+					finalScore = 8;
+				else
+					finalScore = 7;
 				
-//				materialsList.add(objMat);
+				objFdb.setMaterialUrl(materialUrl);
+				objFdb.setFinalScore(finalScore);
+				
+				fdbList.add(objFdb);
+				materialsList.add(objMat);
 			}
+			CyberShaalaDAL.insertIntoMaterialsAsBatch(materialsList);
+			CyberShaalaDAL.insertIntoFeedbackAsBatch(fdbList);
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		} catch (DOMException e) {
@@ -133,7 +153,6 @@ public class YouTubeFeedsUtil {
 		try {
 				expr = xpath.compile(xpathExpr);
 				NodeList node = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				System.out.println("Node:"+node.item(0));
 				if (nodeType=="attr")
 					value = node.item(0).getNodeValue().trim();
 				else
@@ -141,7 +160,6 @@ public class YouTubeFeedsUtil {
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Value:"+value);
 		return value;
 	}
 	
