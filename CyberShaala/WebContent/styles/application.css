@@ -1,0 +1,99 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require_self
+ *= require_tree .
+ */
+div.center-div{
+  margin-left:auto;
+  margin-right:auto;
+  width:27%;
+}
+body {
+    background-color: #FFFFFF;
+    font-size: 13px;
+    margin: 0;
+}
+body, p, h1, h2, h3, h4, table, td, th, ul, ol, textarea, input {
+    font-family: verdana,helvetica,arial,sans-serif;
+    color: #FFFFFF;
+}
+/* table, td, th{
+	border:1px solid #7EBD64;
+    border-collapse: collapse;
+} */
+.navtable {
+	width: 100%;
+	height: 20px;
+    border: none;
+    text-align: center;
+    background-color: #57068C;
+}
+
+table.navtable td{
+	padding: 0px;
+}
+
+.logotd{
+	border:none;
+	height:48px;
+	width:361px;
+	text-align: right;
+}
+
+.navlinkstd {
+	border: none;
+	/* border-collapse: collapse;
+	border-bottom: none;
+	border-left: none;
+	border-top: none;
+	font-family: verdana,helvetica,arial,sans-serif; */
+	font-size: 15px;
+	padding: 15px;
+	width:40px;
+	text-align: center;
+}
+.sesslinkstd {
+	border: none;
+	/* border-collapse: collapse;
+	border-bottom: none;
+	border-left: none;
+	border-top: none;
+	font-family: verdana,helvetica,arial,sans-serif; */
+	font-size: 15px;
+	padding: 15px;
+	width:40px;
+	text-align: center;
+}
+a{
+	text-decoration: none;
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: bold;
+}
+.navlinkstd a:hover, .navlinkstd:hover, .sesslinkstd:hover, .sesslinkstd a:hover{
+	background-color: #7EBD64;
+}
+/* 
+.sessiontd {
+	padding-right:20px;
+	font-family: verdana,helvetica,arial,sans-serif;
+	font-size: 15px;
+	width: 340px;
+	text-align: `center;
+	vertical-align: center;
+	border-left: none;
+} */
+
+label{
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: bold;	
+}

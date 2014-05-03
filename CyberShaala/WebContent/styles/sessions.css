@@ -1,0 +1,39 @@
+// Place all the styles related to the sessions controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+
+table.login-tab,table.login-tab td,table.login-tab th{
+  border:none;
+}
+table.login-tab{
+  width:350px;
+  margin-top: 50px;
+}
+
+.hdr-td h1{
+  text-align:center;
+  font-family: verdana,helvetica,arial,sans-serif;
+  font-size: 30px;
+  color:#7EBD64;
+}
+table.login-tab td{
+  padding:4px;
+  height:25px;
+  text-align:center;
+}
+input[type=text], input[type=password]{
+  width: 325px;
+}
+.label-td{
+  color:#7EBD64;
+  padding:4px;
+  height:25px;
+  text-align:center;
+  font-size:15px;
+  font-weight: bold;
+  font-family: verdana,helvetica,arial,sans-serif;
+}
+td.flash-msg{
+  height:20px;
+}
