@@ -25,20 +25,20 @@
 </br>
 </br>
 <form action="mainservlet?mode=SearchMaterial" name="homepage" method="POST" enctype="multipart/form-data">
-<%com.servlets.UserVO userdetails = (com.servlets.UserVO)request.getAttribute("userdetails");%>
+<%com.cybershaala.vo.UserVO userdetails = (com.cybershaala.vo.UserVO)request.getAttribute("userdetails");%>
 <table height="100" border="0"><tr align="center">
-		<input type="text" id="UserID" name="UserID" size="50" maxlength="100" value="<%=userdetails.getUserId()%>" readonly></input>
-		<input type="text" id="JoinDate" name="JoinDate" size="50" maxlength="100" value="<%=userdetails.getJoinDate()%>" readonly></input>
-		<input type="text" id="Reputation" name="Reputation" size="50" maxlength="100" value="<%=userdetails.getReputation()%>" readonly></input>
-		<input type="text" id="EmailID" name="EmailID" size="50" maxlength="100" value="<%=userdetails.getEmailID()%>"></input>
-		<input type="text" id="FirstName" name="FirstName" size="50" maxlength="100" value="<%=userdetails.getFirstName()%>"></input>
-		<input type="text" id="LastName" name="LastName" size="50" maxlength="100" value="<%=userdetails.getLastName()%>"></input>
-		<input type="text" id="Address" name="Address" size="50" maxlength="100" value="<%=userdetails.getAddress()%>"></input>
-		<input type="text" id="PhoneNumber" name="PhoneNumber" size="50" maxlength="100" value="<%=userdetails.getPhoneNumber()%>"></input>
-		<input type="text" id="FBLink" name="FBLink" size="50" maxlength="100" value="<%=userdetails.getFBLink()%>"></input>
-		<input type="text" id="LinkedIn" name="LinkedIn" size="50" maxlength="100" value="<%=userdetails.getLinkedInLink()%>"></input>
-		<input type="text" id="GitHubLink" name="GitHubLink" size="50" maxlength="100" value="<%=userdetails.getGitHubLink()%>"></input>
-		<input type="text" id="Interests" name="Interests" size="50" maxlength="100" value="<%=userdetails.getInterests()%>"></input>
+		<tr align="center"><td><p>User ID</p></td><td><input type="text" id="UserID" name="UserID" size="50" maxlength="100" value="<%=userdetails.getUserId()%>" readonly></input></td></tr>
+		<tr align="center"><td><p>Join Date</p></td><td><input type="text" id="JoinDate" name="JoinDate" size="50" maxlength="100" value="<%=userdetails.getJoinDate()%>" readonly></input></td></tr>
+		<tr align="center"><td><p>Reputation</p></td><td><input type="text" id="Reputation" name="Reputation" size="50" maxlength="100" value="<%=userdetails.getReputation()%>" readonly></input></td></tr>
+		<tr align="center"><td><p>Primary Email ID</p></td><td><input type="text" id="EmailID" name="EmailID" size="50" maxlength="100" value="<%=userdetails.getEmailID()%>"></input></td></tr>
+		<tr align="center"><td><p>First Name</p></td><td><input type="text" id="FirstName" name="FirstName" size="50" maxlength="100" value="<%=userdetails.getFirstName()%>"></input></td></tr>
+		<tr align="center"><td><p>Last Name</p></td><td><input type="text" id="LastName" name="LastName" size="50" maxlength="100" value="<%=userdetails.getLastName()%>"></input></td></tr>
+		<tr align="center"><td><p>Address</p></td><td><input type="text" id="Address" name="Address" size="50" maxlength="100" value="<%=userdetails.getAddress()%>"></input></td></tr>
+		<tr align="center"><td><p>Phone Number</p></td><td><input type="text" id="PhoneNumber" name="PhoneNumber" size="50" maxlength="100" value="<%=userdetails.getPhoneNumber()%>"></input></td></tr>
+		<tr align="center"><td><p>FaceBook Link</p></td><td><input type="text" id="FBLink" name="FBLink" size="50" maxlength="100" value="<%=userdetails.getFBLink()%>"></input></td></tr>
+		<tr align="center"><td><p>LinkedIn Profile</p></td><td><input type="text" id="LinkedIn" name="LinkedIn" size="50" maxlength="100" value="<%=userdetails.getLinkedInLink()%>"></input></td></tr>
+		<tr align="center"><td><p>GitHub Link</p></td><td><input type="text" id="GitHubLink" name="GitHubLink" size="50" maxlength="100" value="<%=userdetails.getGitHubLink()%>"></input></td></tr>
+		<tr align="center"><td><p>Interests</p></td><td><input type="text" id="Interests" name="Interests" size="50" maxlength="100" value="<%=userdetails.getInterests()%>"></input></td></tr>
 
 	<tr align="center">
 		<input type="submit" value="Update" name="Update" id ="Update"></input>
