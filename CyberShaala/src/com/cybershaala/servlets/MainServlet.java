@@ -89,14 +89,15 @@ public class MainServlet extends HttpServlet {
         if (mode.equalsIgnoreCase("SearchMaterial")){
         	searchTxt = (String)req.getParameter("searchTxt");
         	searchMaterial(req,res,searchTxt);
+        }else if (mode.equalsIgnoreCase("UpdateUser")){
+        	updateUser(req,res,UserId);
         }
         else if (mode.equalsIgnoreCase("DisplayMaterial")){
         	sel_material = (String)req.getParameter("sel_material");
         	displayMaterialPage(req,res,UserId,sel_material);
         }
         else if(mode.equalsIgnoreCase("UploadMaterial")){
-        //	mainvid = (String)req.getParameter("mainvideo");
-        	uploadMaterial(req,res,UserId);
+          	uploadMaterial(req,res,UserId);
         }
         else if(mode.equalsIgnoreCase("PostComment")){
         	mainvid = (String)req.getParameter("materialselected");
@@ -131,6 +132,56 @@ public class MainServlet extends HttpServlet {
             dispatcher.forward(req, res);
 	}
 	
+	public void updateUser(HttpServletRequest req, HttpServletResponse res, String UserId) throws ServletException, IOException{
+		String EmailID = req.getParameter("EmailID");
+		String FirstName = req.getParameter("FirstName");
+		String LastName = req.getParameter("LastName");
+		String Address = req.getParameter("Address");
+		String PhoneNumber = req.getParameter("PhoneNumber");
+		String FBLink = req.getParameter("FBLink");
+		String LinkedIn = req.getParameter("LinkedIn");
+		String GitHubLink = req.getParameter("GitHubLink");
+		String[] Interests = req.getParameterValues("interests");
+		StringBuffer intrsts_string = new StringBuffer();
+		 for(int i=0;i<Interests.length; i++) {
+			 intrsts_string.append(Interests[i]);
+			 intrsts_string.append(",");
+			 System.out.println("here it is sb "+Interests[i]);
+			 System.out.println("here it is sb1 "+intrsts_string);
+		 }
+		
+		String SQL_UPDATE_USER = "update cybershaala_user set LastName= '"+LastName+"', FirstName= '"+FirstName+"', " +
+				"Address= '"+Address+"', PhoneNumber='"+PhoneNumber+"', FBLink= '"+FBLink+"', LinkedIn= '"+LinkedIn+"', "+
+				"GitHubLink= '"+GitHubLink+"', Interests= '"+intrsts_string.toString()+"' WHERE UserID='"+UserId+"'";
+		System.out.println("there u go query "+ SQL_UPDATE_USER);
+		Enumeration paramEnum = req.getParameterNames();
+		//System.out.println("there u go "+ EmailID+FirstName+LastName+Address+PhoneNumber+FBLink+LinkedIn+GitHubLink+Interests);
+		System.out.println("here it is "+paramEnum);
+		 while (paramEnum.hasMoreElements()) {
+			 System.out.println("here it is "+paramEnum.nextElement());
+		 }
+		 Enumeration para = req.getParameterNames();
+		 
+		 while (para.hasMoreElements()) {
+			 System.out.println("here it is getParameterNames "+para.nextElement());
+		 }
+	 
+		Connection con;
+		HttpSession session = req.getSession();
+		try {
+			con = getConnection();
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate(SQL_UPDATE_USER);
+
+			cleanup(con);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		homePage(req,res,UserId);
+       // RequestDispatcher dispatcher = req.getRequestDispatcher("/homepage");
+         //   dispatcher.forward(req, res);
+	}
+	
 	public List<String> getMaterials(String searchtag) throws Exception{
 		String[] interestsArray = null;
 		String materialLink = null;
@@ -140,6 +191,8 @@ public class MainServlet extends HttpServlet {
         List<String> materialNames = new ArrayList<String>();
         List<String> materialIDs = new ArrayList<String>();
 		interestsArray = searchtag.split(",");
+		//if ((interestsArray.length == 0) || (interestsArray.isEmpty()length != null))
+		//	interestsArray = searchtag.split("~!@#$%^");
 		interestsList = Arrays.asList(interestsArray);
 		//materialsList.clear();
 		System.out.println("interested materials are "+ interestsList.toString());
