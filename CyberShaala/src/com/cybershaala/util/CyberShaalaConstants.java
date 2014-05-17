@@ -1,4 +1,4 @@
-package com.cybershaala.vo;
+package com.cybershaala.util;
 
 public class CyberShaalaConstants {
 

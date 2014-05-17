@@ -9,26 +9,25 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
-import com.cybershaala.CyberShaalaDAL;
 import com.cybershaala.data.model.Feedback;
-
 import com.cybershaala.data.model.Materials;
+import com.cybershaala.util.CyberShaalaConstants;
 
 public class CyberShaalaDAL {
-	private static Connection connect = null;
-	private static Statement statement = null;
+	public static Connection connect = null;
+	public static Statement statement = null;
 	private static ResultSet resultSet = null;
-	private static final String DB_END_POINT = "cyberschool.ctnp3jyumtv3.us-west-2.rds.amazonaws.com";
-	private static final String DB_USER_NAME = "schooluser";
-	private static final  String DB_PWD = "cyberuser";
-	private static final String DB_NAME = "cyberschool";
-	private static final int DB_PORT = 3306;
 
 	public static void main(String[] args) {
 		CyberShaalaDAL obj = new CyberShaalaDAL();
-		obj.createConnectionAndStatement();
+		createConnectionAndStatement();
+//		updateFeedbackTableWithMatId();
 //		obj.insertRecord("aleiuflkjewf",1,"abcd.flv");		
 	}
 
@@ -39,7 +38,9 @@ public class CyberShaalaDAL {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			// Setup the connection with the DB
 			connect = DriverManager
-					.getConnection("jdbc:mysql://"+DB_END_POINT+":"+DB_PORT+"/"+DB_NAME,DB_USER_NAME,DB_PWD);
+					.getConnection("jdbc:mysql://"+CyberShaalaConstants.DB_END_POINT+":"
+						+CyberShaalaConstants.DB_PORT+"/"+CyberShaalaConstants.DB_NAME,
+							CyberShaalaConstants.DB_USER_NAME,CyberShaalaConstants.DB_PWD);
 
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
@@ -87,15 +88,43 @@ public class CyberShaalaDAL {
 	public static void insertIntoFeedbackAsBatch(List<Feedback> feedbackList)
 	{
 		createConnectionAndStatement();
-		try {
-			for (Feedback fdb : feedbackList) {
-				String sql = "INSERT INTO cybershaala_feedback (MaterialURL, FinalScore)" +
-						" VALUES ('"+fdb.getMaterialUrl()+"', '"+fdb.getFinalScore()+"')";
+		for (Feedback fdb : feedbackList) {
+			String sql = "INSERT INTO cybershaala_feedback (MaterialURL, FinalScore)" +
+					" VALUES ('"+fdb.getMaterialUrl()+"', '"+fdb.getFinalScore()+"')";
+			try {
 				statement.executeUpdate(sql);
+			} catch (SQLException e) {
+				System.err.println("=====ERROR OCCURRED WHILE INSERTING=====");
+				e.printStackTrace();
 			}
-			close();
+		}
+		close();
+	}
+	
+	public static void updateFeedbackTableWithMatId()
+	{		
+		try {
+			createConnectionAndStatement();
+			String sql = "SELECT * from cybershaala_materials";
+			System.out.println("Executing query-\n"+sql);
+			ResultSet rs = statement.executeQuery(sql);
+			Hashtable<String, String> ht = new Hashtable<String, String>();  
+			while(rs.next())
+			{
+				ht.put(rs.getString("MaterialURL"), rs.getString("MaterialID"));
+			}
+			rs.close();
+			
+			Iterator<Entry<String, String>> it = ht.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<String, String> entry = it.next();
+				String sql2 = "UPDATE cybershaala_feedback SET MaterialID="+entry.getValue()
+						+ " WHERE MaterialURL='"+entry.getKey()+"'";
+				System.out.println("Executing query-\n"+sql2);
+				statement.executeUpdate(sql2);
+			}			
+			
 		} catch (SQLException e) {
-			System.err.println("=====ERROR OCCURRED WHILE INSERTING=====");
 			e.printStackTrace();
 		}
 		finally{
@@ -103,7 +132,7 @@ public class CyberShaalaDAL {
 		}
 	}
 	
-
+	
 //	public void createTable()
 //	{
 //		try {

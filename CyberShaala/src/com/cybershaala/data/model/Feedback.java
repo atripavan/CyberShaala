@@ -2,6 +2,7 @@ package com.cybershaala.data.model;
 
 public class Feedback {
 
+	private int materialId;
 	private String materialUrl;
 	private int starRating;
 	private boolean qOne;
@@ -11,7 +12,13 @@ public class Feedback {
 	private boolean qFive;
 	private int finalScore;
 	private int views;
-	
+
+	public int getMaterialId() {
+		return materialId;
+	}
+	public void setMaterialId(int materialId) {
+		this.materialId = materialId;
+	}
 	public String getMaterialUrl() {
 		return materialUrl;
 	}

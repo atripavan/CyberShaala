@@ -13,14 +13,20 @@
 					</a>
 				</td>
 				<td style="text-align:center; vertical-align: center;border: none;">
-					<table style="border: none; width: 480px; height:100%;">
+					<table style="border: none; width: 580px; height:100%;">
 						<tr>
 							<td class="navlinkstd" style="padding-left: 10px;">
-								<a href="homepage.jsp">Home</a>
+								<a href="home.jsp">Home</a>
 							</td>
 							<td class="navlinkstd">	
-								<a href="upload.jsp">Upload</a>
+								<a href="upload_material.jsp">Upload</a>
 							</td>
+							<td class="navlinkstd">	
+								<a href="search_material.jsp">Search</a>
+							</td>
+							<td class="search-text">	
+								<input style="width:120px;color:#000000;" type="text"/>
+							</td>		
 						</tr>
 					</table>
 				</td>
@@ -28,17 +34,37 @@
 					<table style="width:180px;">
 						<tr>
 							<td class="sesslinkstd">	
-								<a href="mainservlet?mode=updateprofile">Profile</a>
+								<a href="update_profile.jsp">username</a>
 							</td>
 							<td class="sesslinkstd">	
 								<a href="/log_out">Logout</a>
-							</td>					
+							</td>				
 						</tr>
 					</table>
 				</td>
 			</tr>
 		</table>
 	</div>
-	<div></div>
+	<div>
+		<div class="left-panel-div">
+			<table style="width:100%;">
+				<tr>
+					<td class="leftpaneltd"><a href="user_profile.jsp">Profile</a></td>
+				</tr>
+				<tr>
+					<td class="leftpaneltd"><a href="check_out_later.jsp">Check-out Later</a></td>
+				</tr>
+				<tr>
+					<td class="leftpaneltd"><a href="user_history.jsp">History</a></td>
+				</tr>
+				<tr>
+					<td class="leftpaneltd"><a href="notifications.jsp">Notifications</a></td>
+				</tr>
+			</table>
+		</div>
+		<div class="">
+		
+		</div>
+	</div>
 	</body>
 </html>

@@ -43,6 +43,9 @@ public class YouTubeFeedsUtil {
 	XPath xpath = xFactory.newXPath();
 	XPathExpression expr = null;
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	static List<Materials> materialsList = new ArrayList<Materials>();
+	static List<Feedback> fdbList = new ArrayList<Feedback>();
+	static List<String> urlList = new ArrayList<String>();
 	String tags="";
 	
 	public void fetchAndLoadYouTubeFeeds() throws IOException{
@@ -84,8 +87,6 @@ public class YouTubeFeedsUtil {
 
 	public void parseFeedXml(InputStream is)
 	{
-		List<Materials> materialsList = new ArrayList<Materials>();
-		List<Feedback> fdbList = new ArrayList<Feedback>();
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			factory.setNamespaceAware(true);
@@ -101,49 +102,51 @@ public class YouTubeFeedsUtil {
 				numEntryNodes = 25;
 			/*Run through the XML and build Material objects from info in <entry> tags*/ 
 			for(int i=1;i<=numEntryNodes;i++)
-			{
-				Materials objMat = new Materials();
-				Feedback objFdb = new Feedback();
-				
+			{				
 				String materialUrl = getXMLNodeValue(doc, "attr", "//*[local-name()='entry']["+i+"]/*[local-name()='link'][1]/@href");
-				System.out.println("***********Processing video URL:"+materialUrl+"***********");
-				objMat.setMaterialUrl(materialUrl);
-				objMat.setMaterialName(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='title']"));				
-				objMat.setMaterialDesc(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='content']"));
-				objMat.setType("youtube");
-				objMat.setDateTime(new Timestamp((new Date()).getTime()));
-				objMat.setUserId("YouTubeFeeds");
-				objMat.setTags(tags);
-				
-				int viewCount = Integer.parseInt(getXMLNodeValue(doc, "attr", "//*[local-name()='entry'][1]/*[local-name()='statistics']/@viewCount"));
-				int finalScore = 0;
-				if (viewCount > 20000)
-					finalScore = 10;
-				else if (viewCount > 10000)
-					finalScore = 9;
-				else if (viewCount > 5000)
-					finalScore = 8;
+				if(!urlList.contains(materialUrl)){
+					urlList.add(materialUrl);
+					Materials objMat = new Materials();
+					Feedback objFdb = new Feedback();
+					System.out.println("***********Processing video URL:"+materialUrl+"***********");
+					objMat.setMaterialUrl(materialUrl);
+					objMat.setMaterialName(treatQuotes(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='title']")));				
+					objMat.setMaterialDesc(treatQuotes(getXMLNodeValue(doc, "element", "//*[local-name()='entry']["+i+"]/*[local-name()='content']")));
+					objMat.setType("youtube");
+					objMat.setDateTime(new Timestamp((new Date()).getTime()));
+					objMat.setUserId("YouTubeFeeds");
+					objMat.setTags(tags);
+					
+					int viewCount = Integer.parseInt(getXMLNodeValue(doc, "attr", "//*[local-name()='entry'][1]/*[local-name()='statistics']/@viewCount"));
+					int finalScore = 0;
+					if (viewCount > 20000)
+						finalScore = 10;
+					else if (viewCount > 10000)
+						finalScore = 9;
+					else if (viewCount > 5000)
+						finalScore = 8;
+					else
+						finalScore = 7;
+					
+					objFdb.setMaterialUrl(materialUrl);
+					objFdb.setFinalScore(finalScore);
+					
+					fdbList.add(objFdb);
+					materialsList.add(objMat);
+				}
 				else
-					finalScore = 7;
-				
-				objFdb.setMaterialUrl(materialUrl);
-				objFdb.setFinalScore(finalScore);
-				
-				fdbList.add(objFdb);
-				materialsList.add(objMat);
+					System.err.println("///////////DUPLICATE URL/////////////");
 			}
-			CyberShaalaDAL.insertIntoMaterialsAsBatch(materialsList);
-			CyberShaalaDAL.insertIntoFeedbackAsBatch(fdbList);
 		} catch (XPathExpressionException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (DOMException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (SAXException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	
@@ -163,8 +166,17 @@ public class YouTubeFeedsUtil {
 		return value;
 	}
 	
+	public static String treatQuotes(String check)
+	{
+		if(check.contains("'"))
+			check = check.replace("'", "");
+		return check;
+	}
+	
 	public static void main(String[] args) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 		YouTubeFeedsUtil process = new YouTubeFeedsUtil();
 		process.fetchAndLoadYouTubeFeeds();
+		CyberShaalaDAL.insertIntoMaterialsAsBatch(materialsList);
+		CyberShaalaDAL.insertIntoFeedbackAsBatch(fdbList);
 	}
 }
