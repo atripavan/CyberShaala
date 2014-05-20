@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -102,8 +101,8 @@ public class MainServlet extends HttpServlet {
         else if(mode.equalsIgnoreCase("PostComment")){
         	mainvid = (String)req.getParameter("materialselected");
         	postComment(req,res,mainvid);
-        }else if(mode.equalsIgnoreCase("updateprofile")){
-        	updateProfile(req,res,UserId);
+        }else if(mode.equalsIgnoreCase("displayProfile")){
+        	displayProfile(req,res,UserId);
         }
        
         }
@@ -122,8 +121,9 @@ public class MainServlet extends HttpServlet {
 			 while (rs.next())
 				 interests = rs.getString("interests");
 			}
-			List<String> materialsList = getMaterials(interests);
-			session.setAttribute("materialsList", materialsList);
+			MaterialsVO materials = getMaterials(interests);
+			req.setAttribute("materialdetails", materials);
+			//session.setAttribute("materialsList", materialsList);
 			cleanup(con);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -142,6 +142,8 @@ public class MainServlet extends HttpServlet {
 		String LinkedIn = req.getParameter("LinkedIn");
 		String GitHubLink = req.getParameter("GitHubLink");
 		String[] Interests = req.getParameterValues("interests");
+		System.out.println("there u go "+ EmailID+FirstName+LastName+Address+PhoneNumber+FBLink+LinkedIn+GitHubLink+Interests);
+		System.out.println("here it is inter "+Interests);
 		StringBuffer intrsts_string = new StringBuffer();
 		 for(int i=0;i<Interests.length; i++) {
 			 intrsts_string.append(Interests[i]);
@@ -150,7 +152,7 @@ public class MainServlet extends HttpServlet {
 			 System.out.println("here it is sb1 "+intrsts_string);
 		 }
 		
-		String SQL_UPDATE_USER = "update cybershaala_user set LastName= '"+LastName+"', FirstName= '"+FirstName+"', " +
+		String SQL_UPDATE_USER = "update cybershaala_user set EmailID= '"+EmailID+"', LastName= '"+LastName+"', FirstName= '"+FirstName+"', " +
 				"Address= '"+Address+"', PhoneNumber='"+PhoneNumber+"', FBLink= '"+FBLink+"', LinkedIn= '"+LinkedIn+"', "+
 				"GitHubLink= '"+GitHubLink+"', Interests= '"+intrsts_string.toString()+"' WHERE UserID='"+UserId+"'";
 		System.out.println("there u go query "+ SQL_UPDATE_USER);
@@ -182,50 +184,58 @@ public class MainServlet extends HttpServlet {
          //   dispatcher.forward(req, res);
 	}
 	
-	public List<String> getMaterials(String searchtag) throws Exception{
+	public MaterialsVO getMaterials(String searchtag) throws Exception{
+		MaterialsVO materialdetails = new MaterialsVO();
 		String[] interestsArray = null;
 		String materialLink = null;
 		String embedMaterial = null;
         List<String> interestsList = null;
         List<String> materialList = new ArrayList<String>();
         List<String> materialNames = new ArrayList<String>();
-        List<String> materialIDs = new ArrayList<String>();
+       // List<int> materialIDs = new ArrayList<int>();
+        List<String> materialDesc = new ArrayList<String>();
 		interestsArray = searchtag.split(",");
 		//if ((interestsArray.length == 0) || (interestsArray.isEmpty()length != null))
 		//	interestsArray = searchtag.split("~!@#$%^");
 		interestsList = Arrays.asList(interestsArray);
-		//materialsList.clear();
 		System.out.println("interested materials are "+ interestsList.toString());
 		Connection con = getConnection();
 		if (interestsArray.length != 0){
 		for (int i=0; i<interestsArray.length; i++){
 			Statement stmt = con.createStatement();
-			String query = "select MaterialName,MaterialID,MaterialURL from cybershaala_materials where MaterialName like '%"+
+			String query = "select MaterialURL,MaterialName,MaterialDesc from cybershaala_materials where MaterialName like '%"+
 					interestsArray[i]+"%' or MaterialDesc like '%"+interestsArray[i]+"%' or Tags like '%"+interestsArray[i]+"%'";
 			ResultSet rs = stmt.executeQuery(query);
 			
 			if (rs != null) {
 				 while (rs.next()){
-					materialNames.add(rs.getString("MaterialName"));
-					materialIDs.add(rs.getString("MaterialID"));
+					//materialIDs.add(rs.getInt("MaterialID"));
 					materialLink = rs.getString("MaterialURL");
+					materialNames.add(rs.getString("MaterialName"));
+					materialDesc.add(rs.getString("MaterialDesc"));
 					embedMaterial = materialLink.substring(materialLink.indexOf("watch?v=")+8, materialLink.indexOf("&feature"));
 					materialList.add("https://www.youtube.com/embed/"+embedMaterial);
 				 }
+				 materialdetails.setMaterialNamesList(materialNames);
+				 materialdetails.setMaterialDescList(materialDesc);
+				 materialdetails.setMaterialLinkList(materialList);
 			}
+			
 		}
 		}
 		System.out.println("collected materials are "+ materialList.toString());
-		return materialList;
+		return materialdetails;
 	}
 	
 	public void searchMaterial(HttpServletRequest req, HttpServletResponse res, String searchTxt) throws IOException, ServletException{
 		System.out.println("here at searchMaterial");
-		List<String> searchMaterialsList = new ArrayList<String>();
+		//List<String> searchMaterialsList = new ArrayList<String>();
 		try {
-			searchMaterialsList = getMaterials(searchTxt);
-			System.out.println("here at searchMaterial are "+ searchMaterialsList);
-			req.setAttribute("searchMaterialsList", searchMaterialsList);
+			MaterialsVO materials = getMaterials(searchTxt);
+			req.setAttribute("searchMaterials", materials);
+		
+			System.out.println("here at searchMaterial are "+ materials);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -396,8 +406,8 @@ public class MainServlet extends HttpServlet {
           
  	}
 	
-	public void updateProfile(HttpServletRequest req, HttpServletResponse res, String user) throws ServletException, IOException{
-		System.out.println("here at update profile");
+	public void displayProfile(HttpServletRequest req, HttpServletResponse res, String user) throws ServletException, IOException{
+		System.out.println("here at display profile");
 		try {
 			UserVO userdetails = new UserVO();
 			Connection con = getConnection();

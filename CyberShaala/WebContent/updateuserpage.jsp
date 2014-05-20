@@ -24,7 +24,7 @@
 </br>
 </br>
 </br>
-<form action="mainservlet?mode=SearchMaterial" name="homepage" method="POST" enctype="multipart/form-data">
+<form action="mainservlet?mode=updateUser" name="homepage" method="POST">
 <%com.cybershaala.vo.UserVO userdetails = (com.cybershaala.vo.UserVO)request.getAttribute("userdetails");%>
 <table align="center" height="100" border="0"><tr align="center">
 		<tr align="left"><td><p>User ID</p></td><td><input type="text" id="UserID" name="UserID" size="50" maxlength="100" value="<%=userdetails.getUserId()%>" readonly></input></td></tr>
@@ -42,12 +42,10 @@
 		<tr align="left"><td><input type="checkbox" name="interests" value="Engineering">Engineering</td><td><input type="checkbox" name="interests" value="Social">Social</td></tr>
         <tr align="left"><td><input type="checkbox" name="interests" value="Literature">Literature</td><td><input type="checkbox" name="interests" value="Cloud">Cloud</td></tr>
         <tr align="left"><td><input type="checkbox" name="interests" value="Hadoop">Hadoop</td><td><input type="checkbox" name="interests" value="Dijkstra">Dijkstra</td>
-		
-		
 		<tr height="30"></tr>
 		
 	<tr align="center"><td align="left"><input type="submit" value="Update" name="Update" id ="Update"></input></td><td align="left">
-		<input type="button" name="Cancel" value="Cancel" onclick="search();"></input>
+		<input type="button" name="Cancel" value="Cancel" onclick="location.href='<%= request.getContextPath() %>/mainservlet?mode=displayProfile';"></input>
 	</tr>
 
 
