@@ -148,6 +148,28 @@ public class CyberShaalaDAL {
 //
 //	}
 	// You need to close the resultSet
+	
+	public static boolean insertIntoFeedback(Feedback fdb){
+		createConnectionAndStatement();
+		boolean result=false;
+		
+		String sql = "INSERT INTO cybershaala_feedback (MaterialURL, StarRating, Question1, Question2, Question3, "
+				+ "Question4, Question5, FinalScore)" +
+					" VALUES ('"+fdb.getMaterialUrl()+"',"+fdb.getStarRating()+","+fdb.isqOne()+","+fdb.isqTwo()+","
+							+ ""+fdb.isqThree()+","+fdb.isqFour()+","+fdb.isqFive()+","+fdb.getFinalScore()+")";
+		try {
+			statement.executeUpdate(sql);
+			result = true;
+		} catch (SQLException e) {
+			result = false;
+			System.err.println("=====ERROR OCCURRED WHILE INSERTING=====");
+			e.printStackTrace();
+		}
+		finally{
+			close();
+		}
+		return result;
+	} 
 	public static void close() {
 		try {
 			if (resultSet != null) {
