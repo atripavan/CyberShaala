@@ -6,12 +6,22 @@
 <title>Login here</title>
 </head>
 <body>
-<form action="mainservlet?mode=Login&user=YouTubeFeeds" method="POST" name="index">
-<font style="color:black; font-size:12pt; ">Login As</font>
-<input type="text" name="username" size="50" maxlength="50"></input>
-<input type="submit" name="loginsubmit" id="loginsubmit" value="Login" />
-
-
+<form action="mainservlet?mode=Login" method="POST" name="index">
+<table border="0" width="30%" >
+                <thead>
+                    <tr>
+                       <th colspan="2"><font style="color:black; font-size:15pt; ">Login As</font></th>
+                    </tr>
+                </thead>
+                <tbody>
+				<tr><td><input type="text" name="user" size="50" maxlength="50"></input></td></tr>
+				<tr><td><input type="text" name="password" size="50" maxlength="50"></input></td></tr>
+				<tr><td><input type="submit" name="loginsubmit" id="loginsubmit" value="Login"/></td></tr>
+				<tr height="20"></tr>
+				<tr></tr>
+   				<tr><td colspan="2">New User!! Register Here <a href="register.jsp">Register Here</a></td></tr>
+</tbody>
+</table>
 </form>
 </body>
 </html>

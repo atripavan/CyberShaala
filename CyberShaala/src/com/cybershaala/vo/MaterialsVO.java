@@ -20,7 +20,7 @@ public class MaterialsVO {
     private List<String> mats3vidDesc = new ArrayList<String>();
     private List<String> mats3pdfNames = new ArrayList<String>();
     private List<String> mats3pdfDesc = new ArrayList<String>();
-
+    private List<String> materialList = new ArrayList<String>();
 	private int materialId;
 	private String materialUrl;
 	private String materialName;
@@ -170,5 +170,48 @@ public class MaterialsVO {
 	}
 	public void setDateTime(Timestamp dateTime) {
 		this.dateTime = dateTime;
+	}
+	
+	public List<String> MaterialList() {
+		materialList.add("algorithms");
+		materialList.add("divide and conquer");
+		materialList.add("merge sort");
+		materialList.add("insertion sort");
+		materialList.add("bubble sort");
+		materialList.add("big o notation");
+		materialList.add("joins");
+		materialList.add("dijkstra");
+		materialList.add("bellmanford");
+		materialList.add("dynamic programming");
+		materialList.add("greedy algorithms");
+		materialList.add("database");
+		materialList.add("bnf");
+		materialList.add("Engineering");
+		materialList.add("java");
+		materialList.add("python");
+		materialList.add("ruby");
+		materialList.add("django");
+		materialList.add("javascript");
+		materialList.add("design patterns");
+		materialList.add("mobile programming");
+		materialList.add("android");
+		materialList.add("ios");
+		materialList.add("operating system");
+		materialList.add("cloud computing");
+		materialList.add("hadoop");
+		materialList.add("graph algorithms");
+		materialList.add("permutation,combinations");
+		materialList.add("combinatorial probability");
+		materialList.add("digital signal processing");
+		materialList.add("signals and systems");
+		materialList.add("fourier analysis");
+		materialList.add("control systems");
+		materialList.add("thermodynamics");
+		 //  this.materialList = materialList;
+		return materialList;
+		}
+
+	public List<String> getMaterialList() {
+		       return materialList;
 	}
 }

@@ -25,10 +25,13 @@
 </br>
 </br>
 <form action="mainservlet?mode=updateUser" name="homepage" method="POST">
-<%com.cybershaala.vo.UserVO userdetails = (com.cybershaala.vo.UserVO)request.getAttribute("userdetails");%>
+<%com.cybershaala.vo.UserVO userdetails = (com.cybershaala.vo.UserVO)request.getAttribute("userdetails");
+com.cybershaala.vo.MaterialsVO materialdetails = new com.cybershaala.vo.MaterialsVO();
+List<String> materialsList = (List<String>)materialdetails.MaterialList();
+%>
 <table align="center" height="100" border="0"><tr align="center">
 		<tr align="left"><td><p>User ID</p></td><td><input type="text" id="UserID" name="UserID" size="50" maxlength="100" value="<%=userdetails.getUserId()%>" readonly></input></td></tr>
-		<tr align="left"><td><p>Join Date</p></td><td><input type="text" id="JoinDate" name="JoinDate" size="50" maxlength="100" value="<%=userdetails.getJoinDate()%>" readonly></input></td></tr>
+		
 		<tr align="left"><td><p>Reputation</p></td><td><input type="text" id="Reputation" name="Reputation" size="50" maxlength="100" value="<%=userdetails.getReputation()%>" readonly></input></td></tr>
 		<tr align="left"><td><p>Primary Email ID</p></td><td><input type="text" id="EmailID" name="EmailID" size="50" maxlength="100" value="<%=userdetails.getEmailID()%>"></input></td></tr>
 		<tr align="left"><td><p>First Name</p></td><td><input type="text" id="FirstName" name="FirstName" size="50" maxlength="100" value="<%=userdetails.getFirstName()%>"></input></td></tr>
@@ -39,10 +42,10 @@
 		<tr align="left"><td><p>LinkedIn Profile</p></td><td><input type="text" id="LinkedIn" name="LinkedIn" size="50" maxlength="100" value="<%=userdetails.getLinkedInLink()%>"></input></td></tr>
 		<tr align="left"><td><p>GitHub Link</p></td><td><input type="text" id="GitHubLink" name="GitHubLink" size="50" maxlength="100" value="<%=userdetails.getGitHubLink()%>"></input></td></tr>
 		<tr align="left"><td><p>Interests</p></td></tr>
-		<tr align="left"><td><input type="checkbox" name="interests" value="Engineering">Engineering</td><td><input type="checkbox" name="interests" value="Social">Social</td></tr>
-        <tr align="left"><td><input type="checkbox" name="interests" value="Literature">Literature</td><td><input type="checkbox" name="interests" value="Cloud">Cloud</td></tr>
-        <tr align="left"><td><input type="checkbox" name="interests" value="Hadoop">Hadoop</td><td><input type="checkbox" name="interests" value="Dijkstra">Dijkstra</td>
-		<tr height="30"></tr>
+		<% for(int i=0;i<materialsList.size();i++){ %>
+		<tr align="left"><td><input type="checkbox" name="interests" value="<%=materialsList.get(i)%>"><%=materialsList.get(i)%></td></tr>
+		<%}%>
+  		<tr height="30"></tr>
 		
 	<tr align="center"><td align="left"><input type="submit" value="Update" name="Update" id ="Update"></input></td><td align="left">
 		<input type="button" name="Cancel" value="Cancel" onclick="location.href='<%= request.getContextPath() %>/mainservlet?mode=displayProfile';"></input>

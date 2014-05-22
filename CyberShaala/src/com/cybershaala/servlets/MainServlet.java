@@ -71,48 +71,84 @@ public class MainServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String mode = (String)req.getParameter("mode");
-        String UserId = (String)req.getParameter("user");
+        String UserId = null;
         Enumeration paramEnum = req.getParameterNames();
         String sel_material = null;
         String mainvid = null;
         String searchTxt =null;
-        
-        if (UserId==null)
-        	UserId = "YouTubeFeeds";
-        session.setAttribute("UserId", UserId);
-        
+         
         if (mode!=null){
-        
-        if(mode.equalsIgnoreCase("Login"))
+        if(mode.equalsIgnoreCase("Login")){
+        	 UserId = (String)req.getParameter("user");
+        	 System.out.println("the user is "+UserId);
+        	 session.setAttribute("UserId", UserId);
            	homePage(req,res,UserId);
-        if (mode.equalsIgnoreCase("SearchMaterial")){
+        }else if(mode.equalsIgnoreCase("UserRegister")){
+        	UserId = newUserRegister(req,res);
+        	System.out.println("the user is "+UserId);
+        	session.setAttribute("UserId", UserId);
+        	homePage(req,res,UserId);
+        }
+        //if (UserId==null)
+        // 	UserId = "YouTubeFeeds";
+        System.out.println("the user is "+UserId);
+    	// session.setAttribute("UserId", UserId);
+        if (mode.equalsIgnoreCase("HomePage")){
+        	homePage(req,res,(String)session.getAttribute("UserId"));
+        }else if (mode.equalsIgnoreCase("SearchMaterial")){
         	searchTxt = (String)req.getParameter("searchTxt");
         	searchMaterial(req,res,searchTxt);
         }else if (mode.equalsIgnoreCase("UpdateUser")){
-        	updateUser(req,res,UserId);
+        	updateUser(req,res,(String)session.getAttribute("UserId"));
         }
-        else if (mode.equalsIgnoreCase("DisplayMaterial")){
-        	sel_material = (String)req.getParameter("sel_material");
-        	//displayMaterialPage(req,res,UserId,sel_material);
+         else if(mode.equalsIgnoreCase("UploadMaterial")){
+          	uploadMaterial(req,res,(String)session.getAttribute("UserId"));
         }
-        else if(mode.equalsIgnoreCase("UploadMaterial")){
-          	uploadMaterial(req,res,UserId);
-        }
-        else if(mode.equalsIgnoreCase("PostComment")){
-        	mainvid = (String)req.getParameter("materialselected");
-        	//postComment(req,res,mainvid);
-        }else if(mode.equalsIgnoreCase("displayProfile")){
-        	displayProfile(req,res,UserId);
+        else if(mode.equalsIgnoreCase("displayProfile")){
+        	displayProfile(req,res,(String)session.getAttribute("UserId"));
         }
        
         }
  
 	}
-
+	
+	public String newUserRegister(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
+		String email = req.getParameter("email");
+		String fname = req.getParameter("fname");
+		String lname = req.getParameter("lname");
+		String userid = req.getParameter("uname");
+		String phonenumber = req.getParameter("phonenumber");
+		String[] Interests = req.getParameterValues("interests");
+		StringBuffer intrsts_string = new StringBuffer();
+		 for(int i=0;i<Interests.length; i++) {
+			 intrsts_string.append(Interests[i]);
+			 intrsts_string.append(",");
+			 System.out.println("here it is sb "+Interests[i]);
+			 System.out.println("here it is sb1 "+intrsts_string);
+		 }
+		Connection con;
+		String interests = null;
+		HttpSession session = req.getSession();
+		RequestDispatcher dispatcher= null;
+		try {
+			java.util.Date currentDate = new java.util.Date();
+			String insertquery = "insert into cybershaala_user(UserID,EmailID,LastName,FirstName,PhoneNumber,Interests,Reputation) values('"+userid+"','"+email+"','"+lname+"','"+fname+"','"+phonenumber+"','"+intrsts_string.toString()+"','Novice')";
+			con = getConnection();
+			Statement stmt = con.createStatement();
+			stmt.executeUpdate(insertquery);
+			cleanup(con);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return userid;
+	
+	}
+		
 	public void homePage(HttpServletRequest req, HttpServletResponse res, String UserId) throws ServletException, IOException{
 		Connection con;
 		String interests = null;
 		HttpSession session = req.getSession();
+		RequestDispatcher dispatcher= null;
 		try {
 			con = getConnection();
 			Statement stmt = con.createStatement();
@@ -120,15 +156,18 @@ public class MainServlet extends HttpServlet {
 			if (rs != null) {
 			 while (rs.next())
 				 interests = rs.getString("interests");
-			}
-			MaterialsVO materials = getMaterials(interests);
+			 System.out.println("the interets of the user are "+interests);
+			 MaterialsVO materials = getMaterials(interests);
 			req.setAttribute("materialdetails", materials);
-			//session.setAttribute("materialsList", materialsList);
+			dispatcher = req.getRequestDispatcher("/homepage");
+			}
+			else{
+				dispatcher = req.getRequestDispatcher("/errorpage");
+			}
 			cleanup(con);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        RequestDispatcher dispatcher = req.getRequestDispatcher("/homepage");
         dispatcher.forward(req, res);
 	}
 	
@@ -174,7 +213,6 @@ public class MainServlet extends HttpServlet {
 			con = getConnection();
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(SQL_UPDATE_USER);
-
 			cleanup(con);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -216,7 +254,7 @@ public class MainServlet extends HttpServlet {
 				 while (rs.next()){
 					//materialIDs.add(rs.getInt("MaterialID"));
 					materialLink = rs.getString("MaterialURL");
-					System.out.println("the mat url is "+materialLink);
+					//System.out.println("the mat url is "+materialLink);
 					if(materialLink.startsWith("https://www.youtube.com/watch")){
 						embedMaterial = materialLink.substring(materialLink.indexOf("watch?v=")+8, materialLink.indexOf("&feature"));
 						matyoutubevidList.add("https://www.youtube.com/embed/"+embedMaterial);
@@ -347,9 +385,12 @@ public class MainServlet extends HttpServlet {
 		try {
 				con = getConnection();
 				Statement stmt = con.createStatement();
+				Statement stmt1 = con.createStatement();
 				java.util.Date currentDate = new java.util.Date();
 				String insertquery = "insert into cybershaala_materials(UserID,MaterialURL,MaterialName,MaterialDesc,Tags,Type) values('"+user+"','https://s3-us-west-2.amazonaws.com/"+existingBucketName+"/"+uploadfile+"','"+materialName+"','"+materialDesc+"','"+taggedAs+"','s3 upload')";
-				 stmt.executeUpdate(insertquery);
+				String insertqueryfeedback = "insert into cybershaala_feedback(MaterialURL,FinalScore,Views) values('https://s3-us-west-2.amazonaws.com/"+existingBucketName+"/"+uploadfile+"',7.0,1)";
+				stmt.executeUpdate(insertquery);
+				stmt1.executeUpdate(insertqueryfeedback);
 				 cleanup(con);	 
 				 sendMessage("Uploaded a study Material in CyberShaala after change "+uploadfile);
 			
@@ -370,6 +411,7 @@ public class MainServlet extends HttpServlet {
 		System.out.println("here at display profile");
 		try {
 			UserVO userdetails = new UserVO();
+			MaterialsVO mat = new MaterialsVO();
 			Connection con = getConnection();
 			Statement stmt = con.createStatement();
 			String userquery="select * from cybershaala_user where UserID = '"+user+"'";
@@ -390,7 +432,7 @@ public class MainServlet extends HttpServlet {
 					 userdetails.setJoinDate(rs.getDate("JoinDate"));
 				 }
 			}
-			
+			System.out.println("user choices available "+ mat.MaterialList());
 			req.setAttribute("userdetails", userdetails);
 		}catch(Exception ex){
 			
