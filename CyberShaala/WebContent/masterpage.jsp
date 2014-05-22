@@ -2,9 +2,17 @@
 	<head>
 		<title>CyberShaala</title>
 		<link rel="stylesheet" type="text/css" href="styles/application.css">
+		<script type="text/javascript">
+			function search()
+			{
+				var searchTxt = document.getElementById("searchTxt").value;
+				document.location.href="/CyberShaala/mainservlet?mode=SearchMaterial&searchTxt="+searchTxt;
+			}
+	</script>
 	</head>
 	<body>
-	<div style="text-align: center;">
+
+	<div style="text-align: left;">
 		<table class="navtable">
 			<tr>
 				<td class="logotd">
@@ -12,29 +20,31 @@
 						<img src="images/logo.jpg">
 					</a>
 				</td>
-				<td style="text-align:center; vertical-align: center;border: none;">
+				<td style="text-align:left; vertical-align: center;border: none;">
 					<table style="border: none; width: 580px; height:100%;">
 						<tr>
 							<td class="navlinkstd" style="padding-left: 10px;">
-								<a href="home.jsp">Home</a>
+								<a href="mainservlet?mode=Login">Home</a>
 							</td>
 							<td class="navlinkstd">	
-								<a href="upload_material.jsp">Upload</a>
-							</td>
-							<td class="navlinkstd">	
-								<a href="search_material.jsp">Search</a>
+								<a href="upload.jsp">Upload</a>
 							</td>
 							<td class="search-text">	
-								<input style="width:120px;color:#000000;" type="text"/>
+								<input style="width:320px;color:#000000;" type="text" name="searchTxt" id="searchTxt"/>
+							</td>
+							<td class="navlinkstd">
+							<a href="javascript:search();">Search</a>
 							</td>		
 						</tr>
 					</table>
 				</td>
-				<td style="text-align:center; vertical-align: center;border: none;">	
+				<td style="text-align:left; vertical-align: center;border: none;">	
 					<table style="width:180px;">
 						<tr>
-							<td class="sesslinkstd">	
-								<a href="update_profile.jsp">username</a>
+							<td class="sesslinkstd"><font color="white"><i>Welcome <%= session.getAttribute("UserId")%></i></font>
+							</td>
+							<td class="sesslinkstd">
+								<a href="mainservlet?mode=displayProfile">profile</a>
 							</td>
 							<td class="sesslinkstd">	
 								<a href="/log_out">Logout</a>
@@ -48,9 +58,6 @@
 	<div>
 		<div class="left-panel-div">
 			<table style="width:100%;">
-				<tr>
-					<td class="leftpaneltd"><a href="user_profile.jsp">Profile</a></td>
-				</tr>
 				<tr>
 					<td class="leftpaneltd"><a href="check_out_later.jsp">Check-out Later</a></td>
 				</tr>
@@ -66,5 +73,6 @@
 		
 		</div>
 	</div>
+	
 	</body>
 </html>
