@@ -9,6 +9,12 @@
     <param-value>tmpfiles</param-value>
   </context-param>
   <servlet>
+    <description></description>
+    <display-name>MaterialControllerServlet</display-name>
+    <servlet-name>MaterialControllerServlet</servlet-name>
+    <servlet-class>com.cybershaala.servlets.MaterialControllerServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>mainservlet</servlet-name>
     <servlet-class>com.cybershaala.servlets.MainServlet</servlet-class>
   </servlet>
@@ -24,6 +30,10 @@
   <servlet-mapping>
     <servlet-name>homepage</servlet-name>
     <url-pattern>/homepage</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MaterialControllerServlet</servlet-name>
+    <url-pattern>/material</url-pattern>
   </servlet-mapping>
   
   <servlet>

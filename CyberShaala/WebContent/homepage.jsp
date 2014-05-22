@@ -9,7 +9,7 @@
   	<script type="text/javascript">
 	function getMaterial(materialURL,materialName,materialDesc,type)
 	{
-		document.location.href="/CyberShaala/mainservlet?mode=DisplayMaterial&materialURL="+materialURL"&materialName="+materialName"&materialDesc="+materialdesc"&type="+type;
+		document.location.href="/CyberShaala/mainservlet?mode=DisplayMaterial&materialURL="+materialURL+"&materialName="+materialName+"&materialDesc="+materialdesc+"&type="+type;
 	}
 	
 	function search()

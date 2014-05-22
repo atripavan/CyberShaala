@@ -10,7 +10,7 @@ public class Feedback {
 	private boolean qThree;
 	private boolean qFour;
 	private boolean qFive;
-	private int finalScore;
+	private float finalScore;
 	private int views;
 
 	public int getMaterialId() {
@@ -61,10 +61,10 @@ public class Feedback {
 	public void setqFive(boolean qFive) {
 		this.qFive = qFive;
 	}
-	public int getFinalScore() {
+	public float getFinalScore() {
 		return finalScore;
 	}
-	public void setFinalScore(int finalScore) {
+	public void setFinalScore(float finalScore) {
 		this.finalScore = finalScore;
 	}
 	public int getViews() {

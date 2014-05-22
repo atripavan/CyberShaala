@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.util.*"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Home Page</title>
-  	<script type="text/javascript">
+
+<script type='text/javascript'
+	src='https://d1mhrncrfklq8e.cloudfront.net/jwplayer.js'></script>
+<%@ include file="masterpage.jsp" %>
+
+ <script type="text/javascript">
 	function getMaterial(materialURL,materialName,materialDesc,type)
 	{
-		document.location.href="/CyberShaala/mainservlet?mode=DisplayMaterial&materialURL="+materialURL"&materialName="+materialName"&materialDesc="+materialdesc"&type="+type;
+		document.location.href="/CyberShaala/material?materialURL="+materialURL+"&materialName="+materialName+"&materialDesc="+materialDesc+"&type="+type;
 	}
 	
 	function search()
@@ -18,16 +18,6 @@
 		document.location.href="/CyberShaala/mainservlet?mode=SearchMaterial&searchTxt="+searchTxt;
 	}
 	</script>
-	<script type='text/javascript'
-	src='https://d1mhrncrfklq8e.cloudfront.net/jwplayer.js'></script>
-</head>
-<body>
-<table width="1200">
-   <tr valign="top"></tr>
-      <tr>
-          <jsp:include page="masterpage.jsp"/>
-      </tr>
-</table>
 <form action="mainservlet?mode=SearchMaterial" name="homepage" method="POST">
 <%com.cybershaala.vo.MaterialsVO materialdetails = (com.cybershaala.vo.MaterialsVO)request.getAttribute("searchMaterials");
 	List<String> matyoutubenamesList = (List<String>)materialdetails.getMatyoutubeNamesList();
@@ -72,5 +62,3 @@
 
 </table>
 </form>
-</body>
-</html>

@@ -12,4 +12,15 @@ public class CyberShaalaUtilities {
 	    Date parsedDate = dateFormat.parse(dateString);
 	    return new Timestamp(parsedDate.getTime());
 	}
+	
+	public static String getMatEmbedLink(String materialLink)
+	{
+		return "https://www.youtube.com/embed/" + materialLink.
+				substring(materialLink.indexOf("watch?v=")+8, materialLink.indexOf("&feature"));
+	}
+	public static String getOriginalUrl(String materialLink)
+	{
+		return "https://www.youtube.com/watch?v=" + materialLink.
+				substring(materialLink.indexOf("embed/")+6) + "&feature=youtube_gdata";
+	}
 }
