@@ -93,14 +93,14 @@ public class MainServlet extends HttpServlet {
         }
         else if (mode.equalsIgnoreCase("DisplayMaterial")){
         	sel_material = (String)req.getParameter("sel_material");
-        	displayMaterialPage(req,res,UserId,sel_material);
+        	//displayMaterialPage(req,res,UserId,sel_material);
         }
         else if(mode.equalsIgnoreCase("UploadMaterial")){
           	uploadMaterial(req,res,UserId);
         }
         else if(mode.equalsIgnoreCase("PostComment")){
         	mainvid = (String)req.getParameter("materialselected");
-        	postComment(req,res,mainvid);
+        	//postComment(req,res,mainvid);
         }else if(mode.equalsIgnoreCase("displayProfile")){
         	displayProfile(req,res,UserId);
         }
@@ -129,7 +129,7 @@ public class MainServlet extends HttpServlet {
 			e.printStackTrace();
 		}
         RequestDispatcher dispatcher = req.getRequestDispatcher("/homepage");
-            dispatcher.forward(req, res);
+        dispatcher.forward(req, res);
 	}
 	
 	public void updateUser(HttpServletRequest req, HttpServletResponse res, String UserId) throws ServletException, IOException{
@@ -190,10 +190,15 @@ public class MainServlet extends HttpServlet {
 		String materialLink = null;
 		String embedMaterial = null;
         List<String> interestsList = null;
-        List<String> materialList = new ArrayList<String>();
-        List<String> materialNames = new ArrayList<String>();
-       // List<int> materialIDs = new ArrayList<int>();
-        List<String> materialDesc = new ArrayList<String>();
+        List<String> matyoutubevidList = new ArrayList<String>();
+        List<String> mats3vidList = new ArrayList<String>();
+        List<String> mats3pdfList = new ArrayList<String>();
+        List<String> matyoutubeNames = new ArrayList<String>();
+        List<String> matyoutubeDesc = new ArrayList<String>();
+        List<String> mats3vidNames = new ArrayList<String>();
+        List<String> mats3vidDesc = new ArrayList<String>();
+        List<String> mats3pdfNames = new ArrayList<String>();
+        List<String> mats3pdfDesc = new ArrayList<String>();
 		interestsArray = searchtag.split(",");
 		//if ((interestsArray.length == 0) || (interestsArray.isEmpty()length != null))
 		//	interestsArray = searchtag.split("~!@#$%^");
@@ -204,32 +209,48 @@ public class MainServlet extends HttpServlet {
 		for (int i=0; i<interestsArray.length; i++){
 			Statement stmt = con.createStatement();
 			String query = "select MaterialURL,MaterialName,MaterialDesc from cybershaala_materials where MaterialName like '%"+
-					interestsArray[i]+"%' or MaterialDesc like '%"+interestsArray[i]+"%' or Tags like '%"+interestsArray[i]+"%'";
+					interestsArray[i]+"%' or MaterialURL like '%"+interestsArray[i]+"%' or MaterialDesc like '%"+interestsArray[i]+"%' or Tags like '%"+interestsArray[i]+"%'";
 			ResultSet rs = stmt.executeQuery(query);
 			
 			if (rs != null) {
 				 while (rs.next()){
 					//materialIDs.add(rs.getInt("MaterialID"));
 					materialLink = rs.getString("MaterialURL");
-					materialNames.add(rs.getString("MaterialName"));
-					materialDesc.add(rs.getString("MaterialDesc"));
-					embedMaterial = materialLink.substring(materialLink.indexOf("watch?v=")+8, materialLink.indexOf("&feature"));
-					materialList.add("https://www.youtube.com/embed/"+embedMaterial);
+					System.out.println("the mat url is "+materialLink);
+					if(materialLink.startsWith("https://www.youtube.com/watch")){
+						embedMaterial = materialLink.substring(materialLink.indexOf("watch?v=")+8, materialLink.indexOf("&feature"));
+						matyoutubevidList.add("https://www.youtube.com/embed/"+embedMaterial);
+						matyoutubeNames.add(rs.getString("MaterialName"));
+						matyoutubeDesc.add(rs.getString("MaterialDesc"));
+					}else if((materialLink.startsWith("https://s3-us-west-2.amazonaws.com/cybershaalamaterials/")) && (materialLink.endsWith(".mp4"))){
+						mats3vidList.add(materialLink);
+						mats3vidNames.add(rs.getString("MaterialName"));
+						mats3vidDesc.add(rs.getString("MaterialDesc"));
+					}else if(materialLink.endsWith(".pdf")){
+						mats3pdfList.add(materialLink);
+						mats3pdfNames.add(rs.getString("MaterialName"));
+						mats3pdfDesc.add(rs.getString("MaterialDesc"));
 				 }
-				 materialdetails.setMaterialNamesList(materialNames);
-				 materialdetails.setMaterialDescList(materialDesc);
-				 materialdetails.setMaterialLinkList(materialList);
 			}
-			
 		}
 		}
-		System.out.println("collected materials are "+ materialList.toString());
+		 materialdetails.setMatyoutubevidList(matyoutubevidList);
+		 materialdetails.setMats3vidList(mats3vidList);
+		 materialdetails.setMats3pdfList(mats3pdfList);
+		 materialdetails.setMatyoutubeNamesList(matyoutubeNames);
+		 materialdetails.setMatyoutubeDescList(matyoutubeDesc);
+		 materialdetails.setMats3vidNamesList(mats3vidNames);
+		 materialdetails.setMats3vidDescList(mats3vidDesc);
+		 materialdetails.setMats3pdfNamesList(mats3pdfNames);
+		 materialdetails.setMats3pdfDescList(mats3pdfDesc);
+		}
+		System.out.println("collected materials are "+ matyoutubevidList.toString()+mats3vidList.toString()+mats3pdfList.toString());
 		return materialdetails;
 	}
 	
 	public void searchMaterial(HttpServletRequest req, HttpServletResponse res, String searchTxt) throws IOException, ServletException{
 		System.out.println("here at searchMaterial");
-		//List<String> searchMaterialsList = new ArrayList<String>();
+		
 		try {
 			MaterialsVO materials = getMaterials(searchTxt);
 			req.setAttribute("searchMaterials", materials);
@@ -245,91 +266,16 @@ public class MainServlet extends HttpServlet {
 	
 	}
 	
-	public void postComment(HttpServletRequest req, HttpServletResponse res, String mainvid) throws IOException, ServletException{
-		System.out.println("here at post comment video");
-		String existingBucketName = "cloudchatvideos";
-		String cmntvidfile = null; 
-		File tempFile = null;
-		String mainvideo = mainvid;
-		  /************************************************************************/
-	        try{  
-	          List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
-				for (FileItem item : items) {
-					if (!item.isFormField()) {
-						if (FilenameUtils.getName(item.getName()).endsWith(".mp4"))
-							cmntvidfile = item.getName();
-						System.out.println("New comment Msg keyname:"+cmntvidfile);
-						InputStream is = item.getInputStream();
-						tempFile = new File(cmntvidfile);
-						OutputStream outputStream = new FileOutputStream(cmntvidfile);
-
-						int read = 0;
-						byte[] bytes = new byte[1024];
-						while ((read = is.read(bytes)) != -1) {
-							outputStream.write(bytes, 0, read);
-						}
-					}
-				}
-			} catch (FileUploadException e) {
-				e.printStackTrace();
-				throw new ServletException("Cannot parse multipart request.", e);	
-			}
-
-			AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider();
-			AmazonS3 s3client = new AmazonS3Client(credentialsProvider);
-			try {
-	          System.out.println("Uploading a new object to S3 from a file\n");
-	          
-	          AccessControlList acl = new AccessControlList();
-	          acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);             	
-	          s3client.putObject(new PutObjectRequest(existingBucketName, cmntvidfile, tempFile).withAccessControlList(acl));
-
-			} catch (AmazonServiceException ase) {
-	          System.out.println("Caught an AmazonServiceException, which " +
-	          		"means your request made it " +
-	                  "to Amazon S3, but was rejected with an error response" +
-	                  " for some reason.");
-	          System.out.println("Error Message:    " + ase.getMessage());
-	          System.out.println("HTTP Status Code: " + ase.getStatusCode());
-	          System.out.println("AWS Error Code:   " + ase.getErrorCode());
-	          System.out.println("Error Type:       " + ase.getErrorType());
-	          System.out.println("Request ID:       " + ase.getRequestId());
-	      } catch (AmazonClientException ace) {
-	          System.out.println("Caught an AmazonClientException, which " +
-	          		"means the client encountered " +
-	                  "an internal error while trying to " +
-	                  "communicate with S3, " +
-	                  "such as not being able to access the network.");
-	          System.out.println("Error Message: " + ace.getMessage());
-	      }
-	  Connection con;
-		  try {
-				con = getConnection();
-				Statement stmt = con.createStatement();
-				String selvidname= mainvideo.substring(mainvideo.lastIndexOf("/")+1);
-				String insertquery = "insert into VIDEO_INFO(name,s3link,cflink,commentvideo) values('user1','https://s3-us-west-2.amazonaws.com/cloudchatvideos/"+selvidname+"','"+mainvideo+"','https://d1qbtfddxv4pr5.cloudfront.net/"+cmntvidfile+"')";
-				 stmt.executeUpdate(insertquery);
-				 cleanup(con);	 
-				 sendMessage("Uploaded a Comment Video "+cmntvidfile);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			
-		}
-      RequestDispatcher dispatcher = req.getRequestDispatcher("/mainservlet?mode=displayvideo&keyName="+mainvideo);
-          dispatcher.forward(req, res);
-	
-		
-	}
-	
-	
 	public void uploadMaterial(HttpServletRequest req, HttpServletResponse res, String user) throws IOException, ServletException{
 		System.out.println("here at uploadmaterial");
+		try{ 
+		String materialName = null;
+		String taggedAs = null;
+		String materialDesc = null;
 		HttpSession session = req.getSession();
 		Enumeration paramEnum = req.getParameterNames();
 		String uploadfile = null;
-       // String selvid = null;
-                	
+            	
         while (paramEnum.hasMoreElements()) {
             String paramName = (String)paramEnum.nextElement();
             System.out.println("param name in uploadmaterial is "+ paramName);
@@ -338,12 +284,12 @@ public class MainServlet extends HttpServlet {
 		File tempFile = null;
 		Connection con;
       /************************************************************************/
-        try{  
+         
           List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
 			for (FileItem item : items) {
 				if (!item.isFormField()) {
-					
-						uploadfile = item.getName();
+					uploadfile = item.getName();
+					materialName = uploadfile;
 					System.out.println("New upload file keyname:"+uploadfile);
 					InputStream is = item.getInputStream();
 					tempFile = new File(uploadfile);
@@ -354,18 +300,28 @@ public class MainServlet extends HttpServlet {
 					while ((read = is.read(bytes)) != -1) {
 						outputStream.write(bytes, 0, read);
 					}
+				}else if (item.isFormField()) {			
+					System.out.println("the other fileds and values are "+item.getFieldName()+item.getString());
+				
+					if(item.getFieldName().equalsIgnoreCase("taggedAs")){ 
+						taggedAs=item.getString();
+					}
+					else if(item.getFieldName().equalsIgnoreCase("MaterialDesc")){ 
+							materialDesc=item.getString();
+					}
+					System.out.println("Uploading a new material "+materialName+taggedAs+materialDesc);
 				}
 			}
-		} catch (FileUploadException e) {
-			e.printStackTrace();
-			throw new ServletException("Cannot parse multipart request.", e);	
-		}
+			if(taggedAs == null)
+				taggedAs=uploadfile;
+			if(materialDesc == null)
+				materialDesc=uploadfile;
 
 		AWSCredentialsProvider credentialsProvider = new ClasspathPropertiesFileCredentialsProvider();
 		AmazonS3 s3client = new AmazonS3Client(credentialsProvider);
 		try {
           System.out.println("Uploading a new object to S3 from a file\n");
-          
+ 
           AccessControlList acl = new AccessControlList();
           acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);             	
           s3client.putObject(new PutObjectRequest(existingBucketName, uploadfile, tempFile).withAccessControlList(acl));
@@ -380,25 +336,29 @@ public class MainServlet extends HttpServlet {
           System.out.println("AWS Error Code:   " + ase.getErrorCode());
           System.out.println("Error Type:       " + ase.getErrorType());
           System.out.println("Request ID:       " + ase.getRequestId());
-      } catch (AmazonClientException ace) {
-          System.out.println("Caught an AmazonClientException, which " +
-          		"means the client encountered " +
-                  "an internal error while trying to " +
-                  "communicate with S3, " +
-                  "such as not being able to access the network.");
-          System.out.println("Error Message: " + ace.getMessage());
-      }
-	try {
+	      } catch (AmazonClientException ace) {
+	          System.out.println("Caught an AmazonClientException, which " +
+	          		"means the client encountered " +
+	                  "an internal error while trying to " +
+	                  "communicate with S3, " +
+	                  "such as not being able to access the network.");
+	          System.out.println("Error Message: " + ace.getMessage());
+	      }
+		try {
 				con = getConnection();
 				Statement stmt = con.createStatement();
 				java.util.Date currentDate = new java.util.Date();
-				String insertquery = "insert into cybershaala_materials(UserID,MaterialURL,MaterialName,Type) values('"+user+"','https://s3-us-west-2.amazonaws.com/"+existingBucketName+"/"+uploadfile+"','userupload','userupload')";
+				String insertquery = "insert into cybershaala_materials(UserID,MaterialURL,MaterialName,MaterialDesc,Tags,Type) values('"+user+"','https://s3-us-west-2.amazonaws.com/"+existingBucketName+"/"+uploadfile+"','"+materialName+"','"+materialDesc+"','"+taggedAs+"','s3 upload')";
 				 stmt.executeUpdate(insertquery);
 				 cleanup(con);	 
-				 sendMessage("Uploaded a Broadcast Video "+uploadfile);
+				 sendMessage("Uploaded a study Material in CyberShaala after change "+uploadfile);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+        } catch (FileUploadException e) {
+			e.printStackTrace();
+			throw new ServletException("Cannot parse multipart request.", e);	
 		}
       
       RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/mainservlet?mode=Login&user=YouTubeFeeds");
@@ -440,46 +400,7 @@ public class MainServlet extends HttpServlet {
 			
 	}
 	
-	
-	public void displayMaterialPage(HttpServletRequest req, HttpServletResponse res, String user, String video) throws ServletException, IOException{
-		Connection con;
-		String commentvideo = null;
-		String buttonName = null;
-        List<String> commentvideoList = new ArrayList<String>();
-        HttpSession session = req.getSession();
-        Enumeration paramEnum = req.getParameterNames();
-        while (paramEnum.hasMoreElements()) {
-            String paramName = (String)paramEnum.nextElement();
-            System.out.println("the submit is "+paramName);
-        if(paramName.equals("submit")){
-            buttonName = req.getParameter(paramName);
-        }
-        }
-        System.out.println("here at display video "+ video);
-        req.setAttribute("brdvidselected", video);
-		try {
-			con = getConnection();
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("select commentvideo from VIDEO_INFO where cflink='"+video +"' ORDER BY timestamp desc");
-			System.out.println("here at dispaly video "+ video);
-			if (rs != null) {
-			 while (rs.next()){
-				 commentvideo = rs.getString("commentvideo");
-				 System.out.println("comment video is "+commentvideo);
-				 if((commentvideo!=null) && (commentvideo!="") && (commentvideo!="null"))
-					 commentvideoList.add(commentvideo);
-			}
-			}
-			req.setAttribute("commentvideoList", commentvideoList);
-			cleanup(con);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-        RequestDispatcher dispatcher = req.getRequestDispatcher("/commentpage");
-            dispatcher.forward(req, res);
-             
-	}
-	
+
     public Connection getConnection() throws Exception {
     	String conn = System.getProperty("JDBC_CONNECTION_STRING");
     	if (conn ==null)
@@ -510,8 +431,8 @@ public class MainServlet extends HttpServlet {
 		String topicArn = sns.createTopic("MyTopic").getTopicArn();
 		String subscriptionArn = sns.subscribe(topicArn, "email", "pu273@nyu.edu").getSubscriptionArn();
 		String smssubscriptionArn = sns.subscribe(topicArn, "sms", "13474295947").getSubscriptionArn();
-		sns.publish(topicArn, "Hello from SNS world! A new video is uploaded. "+ msg);
-		sns.publish(topicArn, "Hello from SNS world! A new video is uploaded. "+msg,"TwittTube");
+		sns.publish(topicArn, "Hello from CyberShaala! A new Material or Question is uploaded. "+ msg);
+		sns.publish(topicArn, "Hello from CyberShaala! A new Material or Question is uploaded. "+msg,"CyberShaala");
 		//sns.unsubscribe(subscriptionArn);
 		//sns.deleteTopic(topicArn);
 

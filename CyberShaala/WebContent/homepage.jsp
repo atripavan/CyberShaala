@@ -10,7 +10,7 @@
 	function getMaterial(materialURL,materialName,materialDesc)
 	{
 		//var searchTxt = document.getElementById("searchTxt").value;
-		document.location.href="/CyberShaala/mainservlet?mode=SearchMaterial&materialURL="+materialURL"&materialName="+materialName"&materialDesc="+materialdesc;
+		document.location.href="/CyberShaala/mainservlet?mode=displayMaterialPage&materialURL="+materialURL"&materialName="+materialName"&materialDesc="+materialdesc;
 	}
 	</script>
 </head>
