@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import com.cybershaala.CyberShaalaDAL;
 import com.cybershaala.data.model.Feedback;
 import com.cybershaala.data.model.Materials;
@@ -135,7 +138,7 @@ public class MaterialControllerServlet extends HttpServlet {
 	void postQuestion(HttpServletRequest request) {
 		System.out.println("posting question");
 		int queId = Integer.parseInt(request.getParameter("queId"))+1;
-		String userId = (String)request.getSession().getAttribute("userId");
+		String userId = (String)request.getSession().getAttribute("UserId");
 		Timestamp curTime = new Timestamp(new Date().getTime());
 		String sql = "INSERT INTO cybershaala_QA (MaterialURL, Question, Text, UserID, UpdatedDate, VoteUp)"
 				+ " VALUES ('"+request.getParameter("materialUrl")+"', '"+queId+"', "
@@ -145,7 +148,11 @@ public class MaterialControllerServlet extends HttpServlet {
 		try {
 			CyberShaalaDAL.createConnectionAndStatement();
 			CyberShaalaDAL.statement.executeUpdate(sql);
+			sendMessage("New Question posted on your material", (String)request.getSession().getAttribute("emailId"));
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally{
@@ -274,7 +281,7 @@ public class MaterialControllerServlet extends HttpServlet {
 		String result = "";
 		int queId = Integer.parseInt(request.getParameter("queId"));
 		int nextAnsId = Integer.parseInt(request.getParameter("nextAnsId"));
-		String userId = (String)request.getSession().getAttribute("userId");
+		String userId = (String)request.getSession().getAttribute("UserId");
 		Timestamp curTime = new Timestamp(new Date().getTime());
 		String sql = "INSERT INTO cybershaala_QA (MaterialURL, Question, Answer, Text, UserID, UpdatedDate, VoteUp)"
 				+ " VALUES ('"+request.getParameter("materialUrl")+"', '"+queId+"', '"+nextAnsId+"', "
@@ -313,18 +320,27 @@ public class MaterialControllerServlet extends HttpServlet {
 	}
 
 	public float getCyberShaalaScore(Feedback objFdb) {	
-		float finalscore = 0;
-		finalscore+=0.35*objFdb.getStarRating();
+		float finalscore=0;
+		if(objFdb.getStarRating()==5)
+			finalscore+=(0.35*10)*1;
+		else if(objFdb.getStarRating()==4)
+			finalscore+=(0.35*10)*0.8;
+		else if(objFdb.getStarRating()==3)
+			finalscore+=(0.35*10)*0.6;
+		else if(objFdb.getStarRating()==2)
+			finalscore+=(0.35*10)*0.4;
+		else if(objFdb.getStarRating()==1)
+			finalscore+=(0.35*10)*0.2;
 		if(objFdb.isqOne())
-			finalscore+=0.5;
+			finalscore+=(5/100)*10;
 		if(objFdb.isqTwo())
-			finalscore+=0.2;
+			finalscore+=(20/100)*10;
 		if(objFdb.isqThree())
-			finalscore+=0.5;
+			finalscore+=(5/100)*10;
 		if(objFdb.isqFour())
-			finalscore+=2.0;
+			finalscore+=(20/100)*10;
 		if(objFdb.isqFive())
-			finalscore+=1.0;
+			finalscore+=(15/100)*10;
 		return finalscore;
 	}
 
@@ -340,4 +356,15 @@ public class MaterialControllerServlet extends HttpServlet {
 		objQa.setVoteDown(rs.getString("VoteDown"));
 		return objQa;
 	}	
+    public void sendMessage(String msg, String emailid) throws IOException {
+    	   
+        AWSCredentialsProvider myCredentials = new ClasspathPropertiesFileCredentialsProvider();
+        AmazonSNSClient sns = new AmazonSNSClient(myCredentials);
+        String topicArn = sns.createTopic("CyberShaala").getTopicArn();
+        if (emailid.equalsIgnoreCase(null))
+            emailid = "pab424@nyu.edu";
+        String subscriptionArn = sns.subscribe(topicArn, "email", emailid).getSubscriptionArn();
+              sns.publish(topicArn, "Hello! \n\n"+msg,"CyberShaala");
+     
+    }
 }

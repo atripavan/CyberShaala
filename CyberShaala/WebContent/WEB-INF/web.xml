@@ -2,7 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
   <display-name>CyberShaala</display-name>
   <welcome-file-list>
-    <welcome-file>index1.jsp</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
   <context-param>
     <param-name>tempfile.dir</param-name>
@@ -21,6 +21,15 @@
   <servlet-mapping>
     <servlet-name>mainservlet</servlet-name>
     <url-pattern>/mainservlet</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+  <servlet-name>errorpage</servlet-name>
+    <jsp-file>/errorpage.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>errorpage</servlet-name>
+    <url-pattern>/errorpage</url-pattern>
   </servlet-mapping>
   
   <servlet>

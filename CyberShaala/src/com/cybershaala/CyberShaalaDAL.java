@@ -152,11 +152,11 @@ public class CyberShaalaDAL {
 	public static boolean insertIntoFeedback(Feedback fdb){
 		createConnectionAndStatement();
 		boolean result=false;
-		
-		String sql = "INSERT INTO cybershaala_feedback (MaterialURL, StarRating, Question1, Question2, Question3, "
+		String sql = "UPDATE cybershaala_feedback SET FinalScore = ((FinalScore * Views) + "+fdb.getFinalScore()+")/(Views + 1), Views = Views + 1 WHERE MaterialURL='"+fdb.getMaterialUrl()+"'";
+		/*String sql = "INSERT INTO cybershaala_feedback (MaterialURL, StarRating, Question1, Question2, Question3, "
 				+ "Question4, Question5, FinalScore)" +
 					" VALUES ('"+fdb.getMaterialUrl()+"',"+fdb.getStarRating()+","+fdb.isqOne()+","+fdb.isqTwo()+","
-							+ ""+fdb.isqThree()+","+fdb.isqFour()+","+fdb.isqFive()+","+fdb.getFinalScore()+")";
+							+ ""+fdb.isqThree()+","+fdb.isqFour()+","+fdb.isqFive()+","+fdb.getFinalScore()+")";*/
 		try {
 			statement.executeUpdate(sql);
 			result = true;

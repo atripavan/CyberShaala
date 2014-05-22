@@ -182,7 +182,7 @@ function sendFeedback(){
 	});	
 }
 </script>
-<script type='text/javascript' src='https://d1mhrncrfklq8e.cloudfront.net/jwplayer.js'></script>
+<script type='text/javascript' src='https://d4sa5ams81uzt.cloudfront.net/jwplayer.js'></script>
 <link rel="stylesheet" type="text/css" href="styles/material.css">
 <%@ include file="masterpage.jsp" %>
 <div class="left_content_div">
@@ -195,7 +195,7 @@ function sendFeedback(){
 					<script type="text/javascript">									
 						jwplayer('<%=materialUrl%>').setup(
 						{
-							file : "rtmp://s1mdxmsqflz815.cloudfront.net/cfx/st/<%= materialUrl %>",
+							file : "rtmp://s3kmh9e07uly4d.cloudfront.net/cfx/st/<%= materialUrl.substring(materialUrl.lastIndexOf("/")+1) %>",
 							height : "315",
 							width : "560"
 						});	

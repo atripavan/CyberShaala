@@ -6,6 +6,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>User Registration</title>
+		<link rel="stylesheet" type="text/css" href="styles/application.css">
     </head>
     <body>
         <form action="mainservlet?mode=UserRegister" name="RegisterPage" method="POST">

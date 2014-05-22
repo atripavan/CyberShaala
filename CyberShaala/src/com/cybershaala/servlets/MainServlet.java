@@ -132,7 +132,9 @@ public class MainServlet extends HttpServlet {
 		RequestDispatcher dispatcher= null;
 		try {
 			java.util.Date currentDate = new java.util.Date();
-			String insertquery = "insert into cybershaala_user(UserID,EmailID,LastName,FirstName,PhoneNumber,Interests,Reputation) values('"+userid+"','"+email+"','"+lname+"','"+fname+"','"+phonenumber+"','"+intrsts_string.toString()+"','Novice')";
+			String insertquery = "insert into cybershaala_user(UserID,EmailID,LastName,FirstName,PhoneNumber,Interests,Reputation)"
+					+ " values('"+userid+"','"+email+"','"+lname+"','"+fname+"','"+phonenumber+"','"+intrsts_string.toString()+"','Novice')";
+			System.out.println("New User:\n"+insertquery);
 			con = getConnection();
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(insertquery);
@@ -149,9 +151,19 @@ public class MainServlet extends HttpServlet {
 		String interests = null;
 		HttpSession session = req.getSession();
 		RequestDispatcher dispatcher= null;
+		String emailid = null;
 		try {
 			con = getConnection();
 			Statement stmt = con.createStatement();
+			Statement stmt2 = con.createStatement();
+            String getPhonenumber = "Select EmailID from cybershaala_user where UserID = '"+UserId+"'";
+            ResultSet rs1 = stmt2.executeQuery(getPhonenumber);
+            if (rs1 != null) {
+                 while (rs1.next()){
+                     emailid = rs1.getString("EmailID");
+                     session.setAttribute("emailId", emailid);
+                 }
+            }
 			ResultSet rs = stmt.executeQuery("select interests from cybershaala_user where UserId =  '"+UserId+"'");
 			if (rs != null) {
 			 while (rs.next())
@@ -392,7 +404,7 @@ public class MainServlet extends HttpServlet {
 				stmt.executeUpdate(insertquery);
 				stmt1.executeUpdate(insertqueryfeedback);
 				 cleanup(con);	 
-				 sendMessage("Uploaded a study Material in CyberShaala after change "+uploadfile);
+				// sendMessage("Uploaded a study Material in CyberShaala after change "+uploadfile);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -465,20 +477,6 @@ public class MainServlet extends HttpServlet {
         }
     }
     
-    public void sendMessage(String msg) throws IOException {
-		// TODO Auto-generated method stub
-		//PropertiesCredentials myCredentials = new PropertiesCredentials(SNSClient.class.getResourceAsStream("AwsCredentials.properties"));
-		AWSCredentialsProvider myCredentials = new ClasspathPropertiesFileCredentialsProvider();
-		AmazonSNSClient sns = new AmazonSNSClient(myCredentials);
-		String topicArn = sns.createTopic("MyTopic").getTopicArn();
-		String subscriptionArn = sns.subscribe(topicArn, "email", "pu273@nyu.edu").getSubscriptionArn();
-		String smssubscriptionArn = sns.subscribe(topicArn, "sms", "13474295947").getSubscriptionArn();
-		sns.publish(topicArn, "Hello from CyberShaala! A new Material or Question is uploaded. "+ msg);
-		sns.publish(topicArn, "Hello from CyberShaala! A new Material or Question is uploaded. "+msg,"CyberShaala");
-		//sns.unsubscribe(subscriptionArn);
-		//sns.deleteTopic(topicArn);
-
-	}
      
 }
 
